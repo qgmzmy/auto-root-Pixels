@@ -26,7 +26,7 @@ matches = re.findall(pattern, linkList)
 # 下载Factory Image
 if matches:
     print("正在下载Factory Image...")
-    # os.system("curl -o factoryImage.zip " + matches[0])
+    os.system("curl -o factoryImage.zip " + matches[0])
     sha256 = matches[0].split("-")[-1][:-4]
 
     sha256checksum = re.search(r'' + sha256 + "(.*?)<", linkList)
