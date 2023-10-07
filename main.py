@@ -1,6 +1,38 @@
 import os
 import re
 
+os.system('title Auto Root Pixels 禁止用于商业用途')
+print("######################################")
+print("           Auto Root Pixels")
+print("######################################")
+print("                              qgmzmy")
+print(" 禁止用于商业用途")
+print(" 作者不对使用本软件造成的任何后果负责")
+print()
+print("按任意键开始...")
+os.system("pause >nul 2>nul")
+
+
+# 下载adb
+print("正在更新adb...")
+if os.path.exists("adb.exe"):
+    os.remove("adb.exe")
+elif os.path.exists("AdbWinApi.dll"):
+    os.remove("AdbWinApi.dll")
+elif os.path.exists("AdbWinUsbApi.dll"):
+    os.remove("AdbWinUsbApi.dll")
+elif os.path.exists("fastboot.exe"):
+    os.remove("fastboot.exe")
+
+os.system("curl -o adb.zip https://dl.google.com/android/repository/platform-tools_r34.0.4-windows.zip >nul 2>nul")
+os.system("tar -xzvf adb.zip >nul 2>nul")
+os.system("move .\platform-tools\\adb.exe .\\ >nul 2>nul")
+os.system("move .\platform-tools\\fastboot.exe .\\ >nul 2>nul")
+os.system("move .\platform-tools\\AdbWinUsbApi.dll .\\ >nul 2>nul")
+os.system("move .\platform-tools\\AdbWinApi.dll .\\ >nul 2>nul")
+os.remove("adb.zip")
+os.system("rmdir platform-tools /s /q")
+
 
 # 获取最新的下载链接合集
 print("正在获取Factory Image链接...")
@@ -23,12 +55,9 @@ with open("link", "r", encoding="utf-8") as link:
 pattern = r"https://googledownloads.cn/dl/android/aosp/" + productName + "-" + buildId + "-factory-.+?\.zip"
 matches = re.findall(pattern, linkList)
 
-# 下载Factory Image
-if matches:
-    print("正在下载Factory Image...")
-    os.system("curl -o factoryImage.zip " + matches[0])
-    sha256 = matches[0].split("-")[-1][:-4]
 
+def checkImage():
+    sha256 = matches[0].split("-")[-1][:-4]
     sha256checksum = re.search(r'' + sha256 + "(.*?)<", linkList)
     print("正在校验Factory Image...")
     if sha256checksum:
@@ -73,9 +102,31 @@ if matches:
             os.system("adb reboot bootloader")
             os.system("ping 127.0.0.1 >nul 2>nul")
             os.system("fastboot flash " + partition + " new-boot.img reboot")
+            os.system("ping 127.0.0.1 >nul 2>nul")
+            rm = input("刷入完毕，是否删除已下载的镜像[Y/n]: ")
+            if rm == "y" or rm == "Y":
+                os.remove(originDir + "\\factoryImage.zip")
+            os.remove(originDir + "\link")
+            os.system("rmdir " + originDir + "\\" + productName + "-" + buildId + "/s /q")
+            os.system("pause")
         else:
-            print("校验失败")
+            rm = input("校验失败，是否删除已下载的镜像[Y/n]: ")
+            if rm == "y" or rm == "Y":
+                os.remove("factoryImage.zip")
+            os.remove("link")
+            os.system("pause")
     else:
         print("校验失败")
+
+
+# 判断factoryImage.zip是否存在
+if os.path.exists("factoryImage.zip"):
+    checkImage()
 else:
-    print("未找到资源链接")
+    # 下载Factory Image
+    if matches:
+        print("正在下载Factory Image...")
+        os.system("curl -o factoryImage.zip " + matches[0])
+        checkImage
+    else:
+        print("未找到资源链接")
